@@ -28,7 +28,7 @@ async function run() {
     //collection of the product
     const productsCollection = client.db("electoold").collection('products');
     const userCollection = client.db('electoold').collection('users');
-
+    const orderCollection = client.db('electoold').collection('orders');
 
     //getting all products
     app.get('/products', async (req, res) => {
@@ -36,6 +36,23 @@ async function run() {
         const productLimit = parseInt(req.query.limit);
         const products = await productsCollection.find(query).sort({ _id: -1 }).limit(productLimit).toArray();
         res.send(products);
+    })
+    //updating product available
+    app.patch('/products/:id', async (req, res) => {
+        const id = req.params.id;
+
+        const available = req.body.available;
+        const filter = {
+            _id: ObjectId(id)
+        }
+        const option = { upsert: false };
+        const updateDoc = {
+            $set: {
+                available: available,
+            },
+        };
+        const result = await productsCollection.updateOne(filter, updateDoc, option);
+        res.send(result);
     })
     //getting product by its id
     app.get('/products/:id', async (req, res) => {
@@ -62,6 +79,7 @@ async function run() {
                     city: information.city,
                     country: information.country,
                     zip: information.zip,
+                    phone: information.phone,
                 },
             };
             const result = await userCollection.updateOne(query, updateDoc, options);
@@ -74,6 +92,25 @@ async function run() {
         const query = {};
         const filter = await userCollection.find(query).toArray();
         res.send(filter);
+    })
+    //adding orders 
+    app.post('/orders/', async (req, res) => {
+        const orderInformation = req.body;
+        const find = await orderCollection.findOne({ email: orderInformation.email, productID: orderInformation.productID });
+        console.log(!!find);
+        if (find) {
+            return res.send({ success: false, message: `Already have an order place for the same product` });
+        }
+
+        const result = await orderCollection.insertOne(orderInformation);
+        res.send({ success: true, message: `Order Placed` });
+
+    })
+    //get all orders
+    app.get('/orders', async (req, res) => {
+        const query = {};
+        const result = await orderCollection.find(query).toArray();
+        res.send(result)
     })
 }
 run()
