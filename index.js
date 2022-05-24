@@ -51,6 +51,17 @@ async function run() {
     const orderCollection = client.db('electoold').collection('orders');
     const reviewsCollection = client.db('electoold').collection('reviews');
 
+    const verifyAdmin = async (req, res, next) => {
+        const email = req.decoded.email;
+        const find = await userCollection.findOne({ email: email });
+        const admin = find.role === 'admin' ? true : false;
+        if (true) {
+            next();
+        }
+        res.status(401).send({ message: 'Unauthorized' });
+    }
+
+
     //getting all products
     app.get('/products', async (req, res) => {
         const query = {};
@@ -81,6 +92,21 @@ async function run() {
         const query = { _id: ObjectId(id) };
         const filter = await productsCollection.findOne(query);
         res.send(filter);
+    })
+    //deleting a product by admin
+    app.delete('/products/:id', verifyJWT, async (req, res) => {
+        const id = req.params.id;
+        const query = {
+            _id: ObjectId(id)
+        }
+        const result = await productsCollection.deleteOne(query);
+        res.send(result);
+    })
+    //adding a product
+    app.post('/products', verifyJWT, async (req, res) => {
+        const products = req.body;
+        const result = await productsCollection.insertOne(products);
+        res.send(result);
     })
     //updating a user if logged in and inserting a user if he signed up
     app.put('/users/:email', async (req, res) => {
@@ -179,7 +205,6 @@ async function run() {
     app.post('/orders/', verifyJWT, async (req, res) => {
         const orderInformation = req.body;
         const find = await orderCollection.findOne({ email: orderInformation.email, productID: orderInformation.productID, paid: false });
-
         if (find) {
             return res.send({ success: false, message: `Already have an order place for the same product` });
         }
@@ -196,6 +221,8 @@ async function run() {
     })
     //app get orders by email 
     app.get('/orders/:email', verifyJWT, async (req, res) => {
+
+
         const query = {
             email: req.decoded.email
         }
@@ -209,7 +236,17 @@ async function run() {
             _id: ObjectId(id),
         }
         const find = await orderCollection.findOne(query);
-        res.send(find);
+
+        if (find) {
+            const findInProducts = await productsCollection.findOne({
+                name: find.productName
+            });
+            if (!findInProducts) {
+                const result = await orderCollection.deleteOne(query);
+                return res.status(500).send({ message: 'Product is out of stock' });
+            }
+            res.send(find);
+        }
 
     })
     //delete a order
