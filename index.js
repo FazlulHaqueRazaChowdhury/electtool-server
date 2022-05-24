@@ -59,7 +59,7 @@ async function run() {
         res.send(products);
     })
     //updating product available
-    app.patch('/products/:id', async (req, res) => {
+    app.patch('/products/:id', verifyJWT, async (req, res) => {
         const id = req.params.id;
 
         const available = req.body.available;
