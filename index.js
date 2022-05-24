@@ -15,13 +15,13 @@ app.use(express.json());
 
 const verifyJWT = (req, res, next) => {
     const token = req.headers?.authorization?.split(' ')[1];
-    console.log('token', token);
+
     if (!token) {
         return res.status(401).send({ message: 'Unauthorized Access' });
     }
     jwt.verify(token, access_token, function (error, decoded) {
         if (error) {
-            console.log(error);
+
             return res.status(403).send({ message: 'Frobidden Access' })
         }
 
@@ -147,6 +147,34 @@ async function run() {
 
         res.send(find);
     })
+    //making an user admin
+    app.patch('/makeAdmin/:id', verifyJWT, async (req, res) => {
+        const id = req.params.id;
+        const options = { upsert: false };
+        const find = {
+            _id: ObjectId(id)
+        }
+        const updateDoc = {
+            $set: {
+                role: 'admin'
+            }
+        }
+        const filter = await userCollection.updateOne(find, updateDoc, options);
+        res.send(filter);
+    })
+    //seeing if he is admin
+    app.get('/admin/:email', async (req, res) => {
+        const email = req.params.email;
+
+        const query = {
+            email: email
+        }
+        const user = await userCollection.findOne(query);
+        const isAdmin = user?.role === 'admin' ? true : false;
+        res.send({ admin: isAdmin });
+
+    })
+
     //adding orders 
     app.post('/orders/', verifyJWT, async (req, res) => {
         const orderInformation = req.body;
