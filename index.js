@@ -45,8 +45,8 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 //email to me
 
 const password = process.env.NODE_PASS;
-const emailToMe = ({ info }) => {
-    var transporter = nodemailer.createTransport({
+const emailToMe = (info) => {
+    let transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
             user: 'fozlulcoc1592@gmail.com',
@@ -54,7 +54,7 @@ const emailToMe = ({ info }) => {
         }
     });
 
-    var mailOptions = {
+    let mailOptions = {
         from: 'electool@gmail.com',
         to: 'fozlulcoc1592@gmail.com',
         subject: 'ElectTool Message',
