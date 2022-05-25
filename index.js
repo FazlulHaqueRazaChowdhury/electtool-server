@@ -66,25 +66,27 @@ async function run() {
     //getting all products
     app.get('/products', async (req, res) => {
         const query = {};
-        const productLimit = parseInt(req.query.limit);
+        const productLimit = parseInt(req.query?.limit);
         const products = await productsCollection.find(query).sort({ _id: -1 }).limit(productLimit).toArray();
         res.send(products);
     })
     //updating product available
     app.patch('/products/:id', verifyJWT, async (req, res) => {
-        const id = req.params.id;
-        const available = req.body.available;
-        const filter = {
-            _id: ObjectId(id)
+        const id = req.params?.id;
+        if (id) {
+            const available = req.body.available;
+            const filter = {
+                _id: ObjectId(id)
+            }
+            const option = { upsert: false };
+            const updateDoc = {
+                $set: {
+                    available: available,
+                },
+            };
+            const result = await productsCollection.updateOne(filter, updateDoc, option);
+            res.send(result);
         }
-        const option = { upsert: false };
-        const updateDoc = {
-            $set: {
-                available: available,
-            },
-        };
-        const result = await productsCollection.updateOne(filter, updateDoc, option);
-        res.send(result);
     })
     //getting product by its id
     app.get('/products/:id', verifyJWT, async (req, res) => {
