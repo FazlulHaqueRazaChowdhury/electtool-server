@@ -41,6 +41,39 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 //     client.close();
 // });
 
+//email to me
+
+const password = process.env.NODE_PASS;
+const emailToMe = ({ info }) => {
+    var transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: 'fozlulcoc1592@gmail.com',
+            pass: password
+        }
+    });
+
+    var mailOptions = {
+        from: 'electool@gmail.com',
+        to: 'fozlulcoc1592@gmail.com',
+        subject: 'Someone took an appointment have a look!',
+        html: `<h2>Doctors Portal</h2>
+                <div>
+                <h2>Email: ${info.email}</h2>
+                <p>Message: ${info.message}</p>
+                <div>
+
+        `
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            console.log(error);
+        } else {
+            console.log('Email sent: ' + info.response);
+        }
+    });
+}
 
 //function run
 async function run() {
@@ -326,6 +359,17 @@ async function run() {
             });
         }
     });
+
+
+    app.post('/email', async (req, res) => {
+        const info = req.body;
+        const information = {
+            email: info.email,
+            message: info.message
+        }
+        emailToMe(information);
+        res.send({ message: 'Succesfull' })
+    })
 }
 run()
 
