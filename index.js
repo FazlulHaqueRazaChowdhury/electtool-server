@@ -73,7 +73,6 @@ async function run() {
     //updating product available
     app.patch('/products/:id', verifyJWT, async (req, res) => {
         const id = req.params.id;
-
         const available = req.body.available;
         const filter = {
             _id: ObjectId(id)
@@ -211,7 +210,7 @@ async function run() {
         }
 
         const result = await orderCollection.insertOne(orderInformation);
-        res.send({ success: true, message: `Order Placed` });
+        res.send({ success: true, message: `Order Placed`, result });
 
     })
     //get all orders
