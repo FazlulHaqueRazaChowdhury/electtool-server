@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require('cors');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const { query } = require("express");
+const nodemailer = require('nodemailer');
 require('dotenv').config()
 const stripe = require("stripe")(process.env.STRIPE_KEY);
 const app = express();
