@@ -222,7 +222,6 @@ async function run() {
     //app get orders by email 
     app.get('/orders/:email', verifyJWT, async (req, res) => {
 
-
         const query = {
             email: req.decoded.email
         }
@@ -276,6 +275,22 @@ async function run() {
             }
         }
         const result = await orderCollection.updateOne(filter, updateDoc, option);
+        res.send(result);
+    })
+    //update order patch
+    app.patch('/orderStatus', verifyJWT, async (req, res) => {
+        console.log(req.body);
+        const id = req.body.id;
+        const query = {
+            _id: ObjectId(id)
+        }
+        const options = { upsert: false };
+        const updateDoc = {
+            $set: {
+                status: 'shipped'
+            }
+        }
+        const result = await orderCollection.updateOne(query, updateDoc, options);
         res.send(result);
     })
     //add a review 
