@@ -56,8 +56,8 @@ const emailToMe = ({ info }) => {
     var mailOptions = {
         from: 'electool@gmail.com',
         to: 'fozlulcoc1592@gmail.com',
-        subject: 'Someone took an appointment have a look!',
-        html: `<h2>Doctors Portal</h2>
+        subject: 'ElectTool Message',
+        html: `<h2>ElectTool</h2>
                 <div>
                 <h2>Email: ${info.email}</h2>
                 <p>Message: ${info.message}</p>
