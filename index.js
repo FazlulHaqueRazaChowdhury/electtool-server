@@ -264,7 +264,7 @@ async function run() {
         const find = await orderCollection.find(query).toArray();
         res.send(find);
     })
-    //app get a order by id
+
     app.get('/order/:id', verifyJWT, async (req, res) => {
         const id = req.params.id;
         const query = {
@@ -315,7 +315,7 @@ async function run() {
     })
     //update order patch
     app.patch('/orderStatus', verifyJWT, verifyAdmin, async (req, res) => {
-        console.log(req.body);
+
         const id = req.body.id;
         const query = {
             _id: ObjectId(id)
@@ -332,6 +332,13 @@ async function run() {
     //add a review 
     app.post('/reviews', verifyJWT, async (req, res) => {
         const review = req.body;
+        const query = {
+            email: req.body.email
+        }
+        const find = await reviewsCollection.findOne(query);
+        if (find?.email) {
+            return res.send({ message: 'You already gave a review!' });
+        }
         const upload = await reviewsCollection.insertOne(review);
         res.send(upload);
     })
