@@ -11,7 +11,7 @@ var jwt = require('jsonwebtoken');
 const port = process.env.PORT || 5000;
 const access_token = process.env.ACCESS_TOKEN;
 //middleware
-app.use(cors());
+
 app.use(express.json());
 
 const verifyJWT = (req, res, next) => {
