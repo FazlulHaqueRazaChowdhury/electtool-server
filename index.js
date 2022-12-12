@@ -1,6 +1,6 @@
 //importing
 const express = require("express");
-
+const cors = require("cors");
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const { query } = require("express");
 const nodemailer = require('nodemailer');
@@ -11,7 +11,7 @@ var jwt = require('jsonwebtoken');
 const port = process.env.PORT || 5000;
 const access_token = process.env.ACCESS_TOKEN;
 //middleware
-
+app.use(cors());
 app.use(express.json());
 
 const verifyJWT = (req, res, next) => {
